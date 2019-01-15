@@ -35,11 +35,14 @@ template:`
 			<button v-on:click="removeFromCart" :disabled="!inStock" :class="{disabledButton:!inStock}">Remove from Cart</button>  <!--    v-on:click="cart += 1"   -->
 		</div>
 		
+		<product_review></product_review>
+		
 	</div>
 `,
-data(){
-	return {
-		product: 'Socks',
+data()
+{
+	return{
+		product:'Socks',
 		brand:'Warm Me',
 		selectedVarient:0, //image:'vmSocks-green-onWhite.jpg',
 		display_discount:true,
@@ -56,7 +59,7 @@ data(){
 					variantQuantity:0,
 					variantImage:'vmSocks-blue-onWhite.jpg'},
 				],
-		
+
 	}
 },
 
@@ -90,6 +93,20 @@ data(){
 			if(this.premium)
 			{return "Free";}
 			return 2.99;
+		}
+	}
+})
+
+Vue.component('product_review',{
+	template:`
+		<input v-model="name">
+
+	`,
+	data()
+	{
+		return
+		{
+			name:null
 		}
 	}
 })
