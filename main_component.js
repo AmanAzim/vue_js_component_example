@@ -36,13 +36,14 @@ template:`
 		</div>
 		
 		<div>
-			<h2>Reviews</h2>
+			<h2>Reviews:</h2>
 			<p v-if="!reviews.length">No reviews yet</p>
-			<ul>
-				<li v-for="x in reviews">
+			<ul v-else>
+				<li v-for="(x, index) in reviews" :key="index">
 					<p>Name: {{x.name}}</p>
 					<p>Rating: {{x.rating}}</p>
 					<p>Review: {{x.review}}</p>
+					<p>Recommened: {{x.recommend}}</p>
 				</li>
 			</ul>
 	    </div>
@@ -71,7 +72,7 @@ data()
 					variantQuantity:0,
 					variantImage:'vmSocks-blue-onWhite.jpg'},
 				],
-		reviews:[],
+		reviews:[]
 
 	}
 },
@@ -81,7 +82,7 @@ data()
 		addToCart: function(){ this.$emit('add-to-cart-event', this.variants[this.selectedVarient].variantId)}, //listning to event 'all-to-cart-event'
 		removeFromCart: function(){this.$emit('remove-from-cart-event', this.variants[this.selectedVarient].variantId)},
 		updateProductImage: function(index){this.selectedVarient=index;},	   //updateProduct: function(variantImage){this.image=variantImage;}
-		addReview(productReview){ this.reviews.push(productReview)},
+		addReview: function(productReview){ this.reviews.push(productReview);},
 																												
 	},
 	computed:
@@ -143,7 +144,15 @@ Vue.component('product_review',{
         </select>
       </p>
       
-   
+   	   <p>Would you recommend this product?</p>
+        <label>
+          Yes
+          <input type="radio" value="Yes" v-model="recommend"/>
+        </label>
+        <label>
+          No
+          <input type="radio" value="No" v-model="recommend"/>
+        </label>
           
       <p>
         <input type="submit" value="Submit">  
@@ -157,22 +166,26 @@ Vue.component('product_review',{
 			name:null,
 			review:null,
 			rating:null,
+			recommend:null,
 			errors:[],
 		}
 	},
 	methods:
 	{
 		onSubmit(){
-			if(this.name && this.review && this.ratring)
+			if(this.name && this.review && this.ratring && this.recommend)
 			{
+				this.errors.length=0;
 				let productReview={
 					name:this.name,
 					review:this.review,
+					recommend:this.recommend,
 					rating:this.rating
 				}
 				this.$emit('review-submitted', productReview),
 					this.name=null,
 					this.review=null,
+					this.recommend=null,
 					this.ratring=null
 			}
 			else
@@ -180,7 +193,8 @@ Vue.component('product_review',{
 				this.errors.length=0; //delete the old reports from the "errors[]" upon each submittion
 				if(!this.name) this.errors.push("Name required");
 				if(!this.review) this.errors.push("Review required");
-				if(!this.Rating) this.errors.push("Rating required");
+				if(!this.recommend) this.errors.push("Recommendation required");
+				if(!this.rating) this.errors.push("Rating required");
 			}
 
 		}
