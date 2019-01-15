@@ -35,7 +35,19 @@ template:`
 			<button v-on:click="removeFromCart" :disabled="!inStock" :class="{disabledButton:!inStock}">Remove from Cart</button>  <!--    v-on:click="cart += 1"   -->
 		</div>
 		
-		<product_review></product_review>
+		<div>
+			<h2>Reviews</h2>
+			<p v-if="!reviews.length">No reviews yet</p>
+			<ul>
+				<li v-for="x in reviews">
+					<p>Name: {{x.name}}</p>
+					<p>Rating: {{x.rating}}</p>
+					<p>Review: {{x.review}}</p>
+				</li>
+			</ul>
+	    </div>
+		
+		<product_review @review-submitted="addReview"></product_review>
 		
 	</div>
 `,
@@ -59,6 +71,7 @@ data()
 					variantQuantity:0,
 					variantImage:'vmSocks-blue-onWhite.jpg'},
 				],
+		reviews:[],
 
 	}
 },
@@ -67,7 +80,8 @@ data()
 	{
 		addToCart: function(){ this.$emit('add-to-cart-event', this.variants[this.selectedVarient].variantId)}, //listning to event 'all-to-cart-event'
 		removeFromCart: function(){this.$emit('remove-from-cart-event', this.variants[this.selectedVarient].variantId)},
-		updateProductImage: function(index){this.selectedVarient=index;}	   //updateProduct: function(variantImage){this.image=variantImage;}
+		updateProductImage: function(index){this.selectedVarient=index;},	   //updateProduct: function(variantImage){this.image=variantImage;}
+		addReview(productReview){ this.reviews.push(productReview)},
 																												
 	},
 	computed:
@@ -99,20 +113,28 @@ data()
 
 Vue.component('product_review',{
 	template:`
-	<form class="review-form">
+	<form class="review-form" @submit.prevent="onSubmit">
+      
+      <p v-if="errors.length">
+      	<b>Please correct the following errors:</b>
+      	<ul v-for="x in errors">
+    		<li>{{x}}</li>  	
+		</ul>
+      </p>
+      
       <p>
-        <label for="name">Name:</label>
-        <input id="name">
+        <label for="name" >Name:</label>
+        <input id="name" v-model="name">
       </p>
       
       <p>
         <label for="review">Review:</label>      
-        <textarea id="review"></textarea>
+        <textarea id="review" v-model="review"></textarea>
       </p>
       
       <p>
         <label for="rating">Rating:</label>
-        <select id="rating">
+        <select id="rating" v-model="rating">
           <option>5</option>
           <option>4</option>
           <option>3</option>
@@ -120,6 +142,8 @@ Vue.component('product_review',{
           <option>1</option>
         </select>
       </p>
+      
+   
           
       <p>
         <input type="submit" value="Submit">  
@@ -129,11 +153,41 @@ Vue.component('product_review',{
 	`,
 	data()
 	{
-		return
-		{
-			name:null
+		return{
+			name:null,
+			review:null,
+			rating:null,
+			errors:[],
+		}
+	},
+	methods:
+	{
+		onSubmit(){
+			if(this.name && this.review && this.ratring)
+			{
+				let productReview={
+					name:this.name,
+					review:this.review,
+					rating:this.rating
+				}
+				this.$emit('review-submitted', productReview),
+					this.name=null,
+					this.review=null,
+					this.ratring=null
+			}
+			else
+			{
+				this.errors.length=0; //delete the old reports from the "errors[]" upon each submittion
+				if(!this.name) this.errors.push("Name required");
+				if(!this.review) this.errors.push("Review required");
+				if(!this.Rating) this.errors.push("Rating required");
+			}
+
 		}
 	}
+	
+	
+
 })
 
 var app=new Vue(
