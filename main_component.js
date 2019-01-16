@@ -35,20 +35,7 @@ template:`
 			<button v-on:click="removeFromCart" :disabled="!inStock" :class="{disabledButton:!inStock}">Remove from Cart</button>  <!--    v-on:click="cart += 1"   -->
 		</div>
 		
-		<div>
-			<h2>Reviews:</h2>
-			<p v-if="!reviews.length">No reviews yet</p>
-			<ul v-else>
-				<li v-for="(x, index) in reviews" :key="index">
-					<p>Name: {{x.name}}</p>
-					<p>Rating: {{x.rating}}</p>
-					<p>Review: {{x.review}}</p>
-					<p>Recommended: {{x.recommend}}</p>
-				</li>
-			</ul>
-	    </div>
-		
-		<product_review @review-submitted="addReview"></product_review>
+		<review_tabs :reviews="reviews"></review_tabs>
 		
 	</div>
 `,
@@ -112,6 +99,44 @@ data()
 	}
 })
 
+
+Vue.component('review_tabs',{
+	props:{
+		reviews:{
+			type:Array,
+			required:true
+		}
+	},
+	template:`
+		<div>
+			
+			<span class="tab" v-for="(x, index) in tabs" :key="index" @click="selectedTab=x" :class="{activeTab: selectedTab===x}">{{x}}</span>
+			
+		
+			<div v-show="selectedTab==='Reviews' ">
+				<h2>Reviews:</h2>
+				<p v-if="!reviews.length">No reviews yet</p>
+				<ul v-else> 
+					<li v-for="(x, index) in reviews" :key="index">
+						<p>Name: {{x.name}}</p>
+						<p>Rating: {{x.rating}}</p>
+						<p>Review: {{x.review}}</p>
+						<p>Recommended: {{x.recommend}}</p>
+					</li>
+				</ul>
+	    	</div>
+		
+			<!--<product_review v-show="selectedTab==='Make a review'" @review-submitted="addReview"></product_review> -->
+		</div>
+	`,
+	data(){
+		return{
+			tabs:['Reviews','Make a review'],
+			selectedTab:'Reviews'
+		}
+	}
+})
+
 Vue.component('product_review',{
 	template:`
 	<form class="review-form" @submit.prevent="onSubmit">
@@ -171,36 +196,36 @@ Vue.component('product_review',{
 		}
 	},
 	methods:
-	{
-		onSubmit(){
-			if(this.name && this.review && this.rating && this.recommend)
-			{
-				this.errors.length=0;
-				let productReview={
-					name:this.name,
-					review:this.review,
-					recommend:this.recommend,
-					rating:this.rating
+		{
+			onSubmit(){
+				if(this.name && this.review && this.rating && this.recommend)
+				{
+					this.errors.length=0;
+					let productReview={
+						name:this.name,
+						review:this.review,
+						recommend:this.recommend,
+						rating:this.rating
+					}
+					this.$emit('review-submitted', productReview),
+						this.name=null,
+						this.review=null,
+						this.recommend=null,
+						this.ratring=null
 				}
-				this.$emit('review-submitted', productReview),
-					this.name=null,
-					this.review=null,
-					this.recommend=null,
-					this.ratring=null
-			}
-			else
-			{
-				this.errors.length=0; //delete the old reports from the "errors[]" upon each submittion
-				if(!this.name) this.errors.push("Name required");
-				if(!this.review) this.errors.push("Review required");
-				if(!this.recommend) this.errors.push("Recommendation required");
-				if(!this.rating) this.errors.push("Rating required");
-			}
+				else
+				{
+					this.errors.length=0; //delete the old reports from the "errors[]" upon each submittion
+					if(!this.name) this.errors.push("Name required");
+					if(!this.review) this.errors.push("Review required");
+					if(!this.recommend) this.errors.push("Recommendation required");
+					if(!this.rating) this.errors.push("Rating required");
+				}
 
+			}
 		}
-	}
-	
-	
+
+
 
 })
 
