@@ -43,7 +43,7 @@ template:`
 					<p>Name: {{x.name}}</p>
 					<p>Rating: {{x.rating}}</p>
 					<p>Review: {{x.review}}</p>
-					<p>Recommened: {{x.recommend}}</p>
+					<p>Recommended: {{x.recommend}}</p>
 				</li>
 			</ul>
 	    </div>
@@ -82,7 +82,7 @@ data()
 		addToCart: function(){ this.$emit('add-to-cart-event', this.variants[this.selectedVarient].variantId)}, //listning to event 'all-to-cart-event'
 		removeFromCart: function(){this.$emit('remove-from-cart-event', this.variants[this.selectedVarient].variantId)},
 		updateProductImage: function(index){this.selectedVarient=index;},	   //updateProduct: function(variantImage){this.image=variantImage;}
-		addReview: function(productReview){ this.reviews.push(productReview);},
+		addReview(productReview) {this.reviews.push(productReview)}
 																												
 	},
 	computed:
@@ -124,7 +124,7 @@ Vue.component('product_review',{
       </p>
       
       <p>
-        <label for="name" >Name:</label>
+        <label for="name">Name:</label>
         <input id="name" v-model="name">
       </p>
       
@@ -135,7 +135,7 @@ Vue.component('product_review',{
       
       <p>
         <label for="rating">Rating:</label>
-        <select id="rating" v-model="rating">
+        <select id="rating" v-model.number="rating">
           <option>5</option>
           <option>4</option>
           <option>3</option>
@@ -167,13 +167,13 @@ Vue.component('product_review',{
 			review:null,
 			rating:null,
 			recommend:null,
-			errors:[],
+			errors:[]
 		}
 	},
 	methods:
 	{
 		onSubmit(){
-			if(this.name && this.review && this.ratring && this.recommend)
+			if(this.name && this.review && this.rating && this.recommend)
 			{
 				this.errors.length=0;
 				let productReview={
