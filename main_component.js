@@ -22,13 +22,16 @@ template:`
 			<p v-else-if="inStock <=10 && inStock > 0">Almost sold out</p>
 			<p v-else>Out of Stock</p>
 			<p v-show="display_discount">{{onSale}} 10% Discount </p>
+			<!--
 			<p>Shipping: {{shipping}}</p>
 			
 			<ul>
 				<li v-for="x in details">{{ x }}</li>
-			</ul>
+			</ul> -->
+			
+			<shipping_details :details="details" :shipping="shipping"></shipping_details>
 		
-			<!--   v-for="x in variants"   																				<!--@mouseover="updateProduct(x.variantImage)"-->
+			<!--   v-for="x in variants" 																				<!--@mouseover="updateProduct(x.variantImage)"-->
 			<div v-for="(x,index) in variants" :key="x.variantId" class="color-box" :style="{backgroundColor:x.variantColour}"  @mouseover="updateProductImage(index)">
 				
 			</div> 
@@ -236,6 +239,40 @@ Vue.component('product_review',{
 
 
 
+})
+
+Vue.component('shipping_details',{
+	props:{
+		details:{
+			type:Array,
+			required:true
+		},
+		shipping:{
+			required:true
+		}
+	},
+	template:`
+		<div>
+			<span class="tab" v-for="(x, index) in tabs" :key="index" @click="selectedTab=x" :class="{activeTab:selectedTab===x}">{{x}}</span>
+			
+			<div v-show="selectedTab==='Shipping'">
+				<p>{{shipping}}</p>
+			</div>
+			
+			<div v-show="selectedTab==='Details'">
+				<ul>
+					<li v-for="(x, index) in details" :key="index">{{x}}</li>
+				</ul>
+			</div>
+		</div>
+	`,
+	data()
+	{
+		return {
+			tabs: ['Shipping', 'Details'],
+			selectedTab: 'Details'
+		}
+	}
 })
 
 var app=new Vue(
